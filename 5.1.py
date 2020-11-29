@@ -14,7 +14,7 @@ def k_bandit(number_arms, number_actions, e_value):
     upper_bound = []
 
     for arm in range(number_arms):
-        arms.append(numpy.random.uniform(-20, 20))  # self defined borders
+        arms.append(numpy.random.uniform(-10, 10))  # self defined borders
         average_reward.append(0)
         total_reward.append(0)
         times_pulled.append(0)
@@ -94,9 +94,9 @@ k3 = k_bandit(k, T, -1)
 plt.plot(k1, label = 'e-greedy: 0.1')
 plt.plot(k2, label = 'e-greedy: 0.01')
 plt.plot(k3, label = 'UCB')
-plt.xlabel("Time")
-plt.ylabel("Total regret")
-plt.title("Total regret for k-armed bandit problem")
+plt.xlabel("Time(t)")
+plt.ylabel("Total regret L(t)")
+plt.title("Total regret for k-armed bandit problem (k = 14, bounds mean: (-10,10))")
 plt.legend()
 plt.ylim(0)
 plt.show()
