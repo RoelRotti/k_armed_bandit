@@ -43,16 +43,17 @@ def k_bandit(number_arms, number_actions, e_value, arms):
         # UCB
         else:
             # Explore each arm 10 times: hardcoded
-            for arm in range(number_arms):
-                if times_pulled[arm] < 15:
-                    total_reward, times_pulled, average_reward, upper_bound, total_regret = draw_arm(arm, arms, total_reward,
+            if times_pulled[number_arms-1] < 15:
+                for arm in range(number_arms):
+                    if times_pulled[arm] < 15:
+                        total_reward, times_pulled, average_reward, upper_bound, total_regret = draw_arm(arm, arms, total_reward,
                                                                                        times_pulled, average_reward,
                                                                                        upper_bound, total_regret, time)
-                    break
-
-            max_upper_bound = max(upper_bound)
-            arm_max_upper_bound = int(upper_bound.index(max_upper_bound))
-            total_reward, times_pulled, average_reward, upper_bound, total_regret = draw_arm(arm_max_upper_bound, arms, total_reward, times_pulled, average_reward, upper_bound, total_regret, time)
+                        break
+            else:
+                max_upper_bound = max(upper_bound)
+                arm_max_upper_bound = int(upper_bound.index(max_upper_bound))
+                total_reward, times_pulled, average_reward, upper_bound, total_regret = draw_arm(arm_max_upper_bound, arms, total_reward, times_pulled, average_reward, upper_bound, total_regret, time)
 
     # Compensate for total regret
     optimum = max(average_reward)
@@ -76,15 +77,15 @@ def draw_arm(arm, arms, total_reward, times_pulled, average_reward, upper_bound,
     # How to calculate total_regret:
     # total_regret += (optimum - average_reward[arm])
     # But optimum not known so:
-    if average_reward[arm] > 0:
+    if value > 0:
         t = time
         while t < T:
-            total_regret[time] -= value  # at the end: add k*optimum value
+            total_regret[t] -= value  # at the end: add k*optimum value
             t = t + 1
     else:
         t = time
         while t < T:
-            total_regret[time] += value  # at the end: add k*optimum value
+            total_regret[t] += value  # at the end: add k*optimum value
             t = t + 1
 
     return total_reward, times_pulled, average_reward, upper_bound, total_regret
@@ -92,17 +93,22 @@ def draw_arm(arm, arms, total_reward, times_pulled, average_reward, upper_bound,
 
 arms = []
 for arm in range(k):
-    arms.append(numpy.random.uniform(-50, 50))  # self defined borders
+    arms.append(numpy.random.uniform(0, 20))  # self defined borders
 
 
 k1 = k_bandit(k, T, 0.1, arms)
 k2 = k_bandit(k, T, 0.01, arms)
 k3 = k_bandit(k, T, -1, arms)
 
+x = numpy.linspace(1,1000,1000)
+log = 50*numpy.log10(x)
+plt.plot(x, log)
+
 # Plot L(t)
 plt.plot(k1, label = 'e-greedy: 0.1')
 plt.plot(k2, label = 'e-greedy: 0.01')
 plt.plot(k3, label = 'UCB')
+
 plt.xlabel("Time(t)")
 plt.ylabel("Total regret L(t)")
 plt.title("Total regret for k-armed bandit problem (k = 14, bounds mean: (-10,10))")
